@@ -1,0 +1,20 @@
+{
+  "name": "bizlink-v2-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tope-olajide/Bizlink-v2-backend.git"
+  },
+  "keywords": [],
+  "author": "Temitope Olajide",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tope-olajide/Bizlink-v2-backend/issues"
+  },
+  "homepage": "https://github.com/tope-olajide/Bizlink-v2-backend#readme"
+}
