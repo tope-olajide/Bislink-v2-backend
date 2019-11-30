@@ -1,6 +1,6 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
-  const Follower = sequelize.define('Follower', {
+  const Followee = sequelize.define('Followee', {
     userId: {
       type: DataTypes.INTEGER,
       onDelete: 'CASCADE',
@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
         as: 'userId',
       }
     },
-    followerId: {
+    followeeId: {
       type: DataTypes.INTEGER,
       onDelete: 'CASCADE',
       references: {
@@ -20,10 +20,9 @@ module.exports = (sequelize, DataTypes) => {
       }
     }
   }, {});
-  Follower.associate = (models) => {
-    Follower.belongsTo(models.User, {
+  Followee.associate = function(models) {
+    Followee.belongsTo(models.User, {
       foreignKey: 'userId',
     });
-  };
-  return Follower;
+  return Followee;
 };

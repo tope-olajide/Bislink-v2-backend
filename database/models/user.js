@@ -64,6 +64,9 @@ export default (sequelize, DataTypes) => {
     User.hasMany(models.Follower, {
       foreignKey: 'userId'
     });
+    User.hasMany(models.Followee, {
+      foreignKey: 'userId'
+    });
     User.hasMany(models.Notification, {
       foreignKey: 'userId'
     });
