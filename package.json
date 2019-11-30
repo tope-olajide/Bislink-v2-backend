@@ -16,5 +16,12 @@
   "bugs": {
     "url": "https://github.com/tope-olajide/Bizlink-v2-backend/issues"
   },
-  "homepage": "https://github.com/tope-olajide/Bizlink-v2-backend#readme"
+  "homepage": "https://github.com/tope-olajide/Bizlink-v2-backend#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "pg": "^7.14.0",
+    "pg-hstore": "^2.3.3",
+    "sequelize": "^5.21.2",
+    "sequelize-cli": "^5.5.1"
+  }
 }
