@@ -1,5 +1,5 @@
 import cors from 'cors';
-
+import routes from './routes';
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -19,7 +19,7 @@ app.get('/', (req, res) => {
     message: 'Welcome to bizLink Homepage!'
   });
 });
-
+app.use('/api/', routes);
 
 app.get('*', (req, res) => {
   res.status(404).send({
