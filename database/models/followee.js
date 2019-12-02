@@ -20,9 +20,10 @@ module.exports = (sequelize, DataTypes) => {
       }
     }
   }, {});
-  Followee.associate = function(models) {
+  Followee.associate = (models) => {
     Followee.belongsTo(models.User, {
       foreignKey: 'userId',
     });
+  };
   return Followee;
 };
