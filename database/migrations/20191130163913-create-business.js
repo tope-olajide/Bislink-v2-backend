@@ -15,11 +15,11 @@ module.exports = {
       type: Sequelize.STRING,
       allowNull: true,
     },
-    businessAddress1: {
+    businessAddress: {
       type: Sequelize.STRING,
       allowNull: false
     },
-    phoneNumber1: {
+    phoneNumber: {
       type: Sequelize.STRING,
       allowNull: false,
     },
