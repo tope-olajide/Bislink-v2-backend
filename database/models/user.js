@@ -36,7 +36,7 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    ImageUrl: {
+    imageUrl: {
       type: DataTypes.STRING,
       allowNull: true,
     },
