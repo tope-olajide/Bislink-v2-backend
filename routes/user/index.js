@@ -8,4 +8,5 @@ user.post('/signin', User.signIn);
 
 user.use('*', Auth.verify);
 user.put('/profile', User.modifyUser);
+user.put('/change-password', User.changePassword);
 export default user;

@@ -221,7 +221,8 @@ export default class Users {
       return res.status(200).json({
         success: true,
         message: 'User record updated',
-        updatedUser
+        updatedUser,
+        token
       });
     } catch (error) {
       res.status(500).json({
@@ -230,5 +231,54 @@ export default class Users {
         error
       });
     }
+  }
+
+  static async changePassword({
+    body,
+    user
+  }, res) {
+    const { id } = user;
+    const {
+      oldPassword,
+      newPassword
+    } = body;
+
+    if (newPassword.trim().length === 0 || newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 5 characters!'
+      });
+    }
+
+    const password = bcryptjs.hashSync(newPassword, 10);
+    const userFound = await User
+      .findOne({
+        attributes: ['id', 'password'],
+        where: {
+          id
+        }
+      });
+    if (!userFound) {
+      return res.status(404).json({
+        success: false,
+        message: 'User does not exist!'
+      });
+    }
+    if (!bcryptjs.compareSync(oldPassword, userFound.password)) {
+      return res.status(401).json({
+        success: false,
+        message: 'Incorrect Password'
+      });
+    }
+    const newPwd = await userFound.update({
+      password
+    });
+    return res.status(200).json({
+      success: true,
+      message: 'Password Changed Successfully',
+      newPwd
+    });
+
+
   }
 }
