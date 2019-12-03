@@ -5,8 +5,11 @@ import Sequelize from 'sequelize';
 import bcryptjs from 'bcryptjs';
 import { User, Notification } from '../database/models';
 import {
-  validateUser,
+  validateUser, validateModifiedUser
 } from '../middleware/validator';
+
+require('dotenv').config();
+
 
 const { Op } = Sequelize;
 export default class Users {
@@ -70,7 +73,7 @@ export default class Users {
         email: createdUser.email,
         username: createdUser.username,
       },
-      'process.env.JWT_SECRET', {
+      process.env.JWT_SECRET, {
         expiresIn: '24h',
       });
       const newNotification = await Notification
@@ -116,7 +119,7 @@ export default class Users {
           message: 'Invalid login Details!'
         });
       }
-       if (bcryptjs.compareSync(password, userFound.password)) {
+      if (bcryptjs.compareSync(password, userFound.password)) {
         const {
           id,
           username,
@@ -127,7 +130,7 @@ export default class Users {
           username,
           email,
         },
-        'process.env.JWT_SECRET', {
+        process.env.JWT_SECRET, {
           expiresIn: '24h',
         });
         return res.status(200).json({
@@ -135,7 +138,7 @@ export default class Users {
           message: 'Login successfully',
           token,
         });
-      } 
+      }
       res.status(401).json({
         success: false,
         message: 'Invalid login Details!'
@@ -144,6 +147,86 @@ export default class Users {
       return res.status(500).json({
         success: false,
         message: 'An error occured',
+        error
+      });
+    }
+  }
+
+  static async modifyUser({ body, user }, res) {
+    const userId = user.id;
+    const { username } = user;
+    const {
+      fullname,
+      email,
+      phoneNumber,
+      location,
+      about,
+      imageUrl,
+    } = body;
+    const userDetailsError = validateModifiedUser({
+      fullname,
+      email
+    });
+    if (userDetailsError) {
+      return res.status(400).json({
+        success: false,
+        message: userDetailsError
+      });
+    } try {
+      const confirmedUser = await User.findOne({
+        where: {
+          id: userId
+        },
+      });
+      if (!confirmedUser) {
+        return res.status(404).json({
+          success: false,
+          message: 'User not found'
+        });
+      }
+      const foundUser = await User.findOne({
+        where: {
+          email
+        },
+      });
+      if (foundUser) {
+        if (foundUser.id !== userId) {
+          return res.status(409).json({
+            success: false,
+            message: 'Email address already taken'
+          });
+        }
+      }
+
+      const updatedUser = await foundUser.update({
+        fullname,
+        email,
+        phoneNumber,
+        location,
+        about,
+        imageUrl: imageUrl || foundUser.imageUrl,
+      });
+      const {
+        id
+      } = updatedUser;
+      const token = jwt.sign({
+        id,
+        username,
+        email: updatedUser.email,
+      },
+      process.env.JWT_SECRET, {
+        expiresIn: '24h',
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: 'User record updated',
+        updatedUser
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Error Updating user's profile",
         error
       });
     }
