@@ -147,15 +147,15 @@ export const validateUser = ({
   return false;
 };
 export const validateBusiness = ({
-  businessName, businessAddress1, businessDescription, phoneNumber1
+  businessName, businessAddress, businessDescription, phoneNumber
 }) => {
   if (!businessName || businessName.trim().length < 5) {
     return 'Business name must be more than 5 characters!';
   }
-  if (!businessAddress1 || businessAddress1.length < 5) {
+  if (!businessAddress || businessAddress.length < 5) {
     return 'Business Address must be atleast 5 characters long!';
   }
-  if (!phoneNumber1 || phoneNumber1.trim().length < 5) {
+  if (!phoneNumber || phoneNumber.trim().length < 5) {
     return 'Business phone-number must be more than 5 characters!';
   }
   if (!businessDescription || businessDescription.length < 10) {
