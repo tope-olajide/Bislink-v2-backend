@@ -253,4 +253,40 @@ export default class Businesses {
       });
     }
   }
+
+  static async getAllBusinesses(req, res) {
+    const limit = Number(req.query.limit) || 9;
+    const currentPage = Number(req.query.page) || 1;
+    const offset = (currentPage - 1) * limit;
+    try {
+      const businesses = await Business
+        .findAndCountAll({
+          include: [{
+            model: User,
+            attributes: ['fullname']
+          }],
+          limit,
+          offset
+        });
+      const totalPages = businesses.count;
+      if (businesses.rows.length < 1) {
+        return res.status(204).json({
+          success: true,
+          message: 'Nothing found!',
+          businesses: []
+        });
+      }
+      return res.status(200).json({
+        success: true,
+        message: 'business(es) found!',
+        businesses: businesses.rows,
+        totalPages
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: 'Error fetching all businesses',
+      });
+    }
+  }
 }
