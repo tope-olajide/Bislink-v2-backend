@@ -253,4 +253,39 @@ export default class Businesses {
       });
     }
   }
+
+  static async getUserBusiness({
+    user,
+  }, res) {
+    const userId = user.id;
+    try {
+      const business = await Business
+        .findAll({
+          where: {
+            userId
+          },
+          include: [{
+            model: User,
+            attributes: ['fullname', 'username', 'updatedAt']
+          }]
+        });
+      if (business.length < 1) {
+        return res.status(204).json({
+          success: true,
+          message: 'You currently do not have any business',
+        });
+      }
+      return res.status(201).json({
+        success: true,
+        message: 'Operation Successful',
+        business
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: 'Unable to get user business',
+        error
+      });
+    }
+  }
 }
