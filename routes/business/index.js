@@ -7,7 +7,8 @@ const business = express.Router();
 
 business.use('*', Auth.verify);
 business.route('/')
-  .post(Businesses.createNewBusiness);
+  .post(Businesses.createNewBusiness)
+  .get(Businesses.getAllBusinesses);
 business.route('/:businessId')
   .put(Businesses.modifyBusiness)
   .delete(Businesses.deleteBusiness);
