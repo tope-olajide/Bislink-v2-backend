@@ -9,5 +9,6 @@ business.use('*', Auth.verify);
 business.route('/')
   .post(Businesses.createNewBusiness);
 business.route('/:businessId')
-  .put(Businesses.modifyBusiness);
+  .put(Businesses.modifyBusiness)
+  .delete(Businesses.deleteBusiness);
 export default business;
