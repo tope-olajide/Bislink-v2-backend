@@ -171,7 +171,7 @@ export default class Businesses {
       businessDescription,
       businessImageUrl
     } = body;
-     const isUser = await validateUserRight(businessId, userId); 
+    const isUser = await validateUserRight(businessId, userId);
     if (isUser.success) {
       const foundBusiness = isUser.businessFound;
       const validateBusinessError = validateBusiness({
@@ -224,5 +224,33 @@ export default class Businesses {
       }
     }
     return res.status(400).json(isUser);
+  }
+
+  static async deleteBusiness({
+    params,
+    user
+  }, res) {
+    const {
+      businessId
+    } = params;
+    try {
+      const isUser = await validateUserRight(businessId, user.id);
+      if (isUser.success) {
+        const { businessFound } = isUser;
+        const removedBusiness = await businessFound.destroy();
+        return res.status(200).json({
+          success: true,
+          message: 'Business Deleted!',
+          removedBusiness
+        });
+      }
+      return res.status(isUser.status).json(isUser);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Error deleting business',
+        error
+      });
+    }
   }
 }
