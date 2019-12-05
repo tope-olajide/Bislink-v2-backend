@@ -9,6 +9,8 @@ business.use('*', Auth.verify);
 business.route('/')
   .post(Businesses.createNewBusiness)
   .get(Businesses.getAllBusinesses);
+business.route('/search')
+  .get(Businesses.searchForBusinesses);
 business.route('/:businessId')
   .put(Businesses.modifyBusiness)
   .delete(Businesses.deleteBusiness)

@@ -1,6 +1,7 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable require-jsdoc */
 import Sequelize from 'sequelize';
+import BusinessSearch from './searchBusiness';
 import {
   Business,
   User,
@@ -415,6 +416,20 @@ export default class Businesses {
         message: 'Error fetching business details',
         error
       });
+    }
+  }
+
+  static async searchForBusinesses(req, res) {
+    if (req.query.sort === 'popular') {
+      BusinessSearch.sortByMostPopular(req, res);
+    } else if (req.query.sort === 'recent') {
+      BusinessSearch.sortByMostRecent(req, res);
+    } else if (!req.query.name || req.query.name === ' ') {
+      BusinessSearch.searchAllLocation(req, res);
+    } else if (!req.query.location) {
+      BusinessSearch.searchBusinessName(req, res);
+    } else {
+      BusinessSearch.searchBusinessInLocation(req, res);
     }
   }
 }
