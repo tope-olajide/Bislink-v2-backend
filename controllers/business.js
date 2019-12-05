@@ -5,6 +5,7 @@ import {
   Business,
   User,
   Follower,
+  Followee,
   Favourite,
   Notification
 } from '../database/models';
@@ -321,6 +322,98 @@ export default class Businesses {
       return res.status(500).json({
         success: false,
         message: 'Error fetching all businesses',
+      });
+    }
+  }
+
+  static async getBusinessDetails({ params, user }, res) {
+    const userId = user.id;
+    const {
+      businessId
+    } = params;
+    if (isNaN(businessId)) {
+      res.status(422).json({
+        success: false,
+        message: 'Invalid Business ID'
+      });
+    }
+    try {
+      const otherInfo = {};
+      const businessFound = await Business
+        .findOne({
+          where: {
+            id: businessId
+          },
+          include: [{
+            model: User,
+            attributes: ['id', 'username', 'location', 'imageUrl', 'about']
+          }]
+        });
+      if (!businessFound) {
+        res.status(404).json({
+          success: true,
+          message: 'Business does not exist!'
+        });
+      }
+      const business = await businessFound.increment('viewCount');
+      if (userId === business.User.id) {
+        otherInfo.isBusinessOwner = true;
+      } else {
+        otherInfo.isBusinessOwner = false;
+      }
+      const businessCount = await Business.count({
+        where: {
+          userId: business.User.id
+        }
+      });
+      otherInfo.businessCount = businessCount;
+      const followersCount = await Follower.count({
+        where: {
+          userId: business.User.id
+        }
+      });
+      otherInfo.followersCount = followersCount;
+      const followeesCount = await Followee.count({
+        where: {
+          userId: business.User.id
+        }
+      });
+      otherInfo.followeesCount = followeesCount;
+      const favourites = await Favourite
+        .findOne({
+          where: {
+            userId,
+            businessId
+          }
+        });
+      if (favourites) {
+        otherInfo.isUserFavourite = true;
+      } else {
+        otherInfo.isUserFavourite = false;
+      }
+      const isFollowing = await Follower
+        .findOne({
+          where: {
+            userId: business.User.id,
+            followerId: userId
+          }
+        });
+      if (isFollowing) {
+        otherInfo.isFollowing = true;
+      } else {
+        otherInfo.isFollowing = false;
+      }
+      res.status(200).json({
+        success: true,
+        message: 'business found',
+        business,
+        otherInfo
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: 'Error fetching business details',
+        error
       });
     }
   }
