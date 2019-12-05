@@ -11,5 +11,6 @@ business.route('/')
   .get(Businesses.getAllBusinesses);
 business.route('/:businessId')
   .put(Businesses.modifyBusiness)
-  .delete(Businesses.deleteBusiness);
+  .delete(Businesses.deleteBusiness)
+  .get(Businesses.getBusinessDetails);
 export default business;
