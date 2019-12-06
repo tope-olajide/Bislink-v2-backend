@@ -11,9 +11,10 @@ user.post('/signin', User.signIn);
 user.use('*', Auth.verify);
 user.put('/profile', User.modifyUser);
 user.put('/change-password', User.changePassword);
-user.get('/businesses', Businesses.getUserBusiness);
+user.get('/businesses', Businesses.getUserBusiness);  user.get('/favourites', Favourite.getFavBusinesses);
 user
   .route('/favourite/:businessId')
   .post(Favourite.addToFavourite)
-  .delete(Favourite.removeFromFavourites)
+  .delete(Favourite.removeFromFavourites);
+
 export default user;

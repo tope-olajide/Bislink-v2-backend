@@ -81,4 +81,40 @@ export default class Favourites {
       });
     }
   }
+
+  static async getFavBusinesses({ user }, res) {
+    const userId = user.id;
+    try {
+      const favourites = await Favourite
+        .findAll({
+          where: { userId }
+        });
+      if (favourites.length < 1) {
+        return res.status(204).json({
+          success: true,
+          message: 'Nothing found!',
+          business: []
+        });
+      }
+
+      const ids = favourites.map((business) => business.businessId);
+      const businesses = await Business.findAll({
+        where: { id: ids },
+        include: [
+          { model: User, attributes: ['fullname'] }
+        ]
+      });
+      res.status(200).json({
+        success: true,
+        message: 'Favourite Businesses found',
+        businesses
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: 'Error fetching Favourite business',
+        error
+      });
+    }
+  }
 }
