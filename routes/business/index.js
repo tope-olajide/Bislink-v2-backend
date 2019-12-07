@@ -19,12 +19,12 @@ business.route('/:businessId')
   .delete(Businesses.deleteBusiness)
   .get(Businesses.getBusinessDetails);
 
-  user
+  business
   .route('/:businessId/upvotes')
   .post(Vote.upvoteBusiness)
   .get(Vote.getBusinessUpvotes);
 
-user
+  business
   .route('/:businessId/downvotes')
   .post(Vote.downvoteBusiness)
   .get(Vote.getBusinessDownvotes);
