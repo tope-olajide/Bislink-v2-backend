@@ -83,4 +83,43 @@ export default class Reviews {
       });
     }
   }
+
+  static async getBusinessReviews({
+    params
+  }, res) {
+    const { businessId } = params;
+    try {
+      const reviews = await Review
+        .findAll({
+          where: {
+            businessId
+          },
+          include: [{
+            model: User,
+            attributes: ['username', 'ImageUrl']
+          }],
+          order: [
+            ['id', 'DESC']
+          ]
+        });
+      if (reviews.length === 0) {
+        return res.status(204).json({
+          success: true,
+          message: 'No Review found!',
+          reviews: []
+        });
+      }
+      return res.status(200).json({
+        success: true,
+        message: 'Review(s) found',
+        reviews
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching reviews',
+        error
+      });
+    }
+  }
 }
