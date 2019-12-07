@@ -164,4 +164,44 @@ export default class Vote {
       });
     }
   }
+
+  static async getBusinessUpvotes({
+    params
+  }, res) {
+    const {
+      businessId
+    } = params;
+    try {
+      const votes = await Upvote
+        .findAll({
+          attributes: ['businessId'],
+          where: {
+            businessId
+          },
+          include: [{
+            model: User,
+            attributes: ['fullname', 'id']
+          }]
+        });
+      if (votes.length === 0) {
+        return res.status(204).json({
+          success: true,
+          message: 'Nothing found!',
+          votes: []
+        });
+      }
+      return res.status(200).json({
+        success: true,
+        message: 'User upvotes found',
+        votes
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: 'Error fetching upvotes',
+        error
+      });
+    }
+  }
+
 }
