@@ -1,4 +1,4 @@
-import { Business, } from '../database/models';
+import { Business, Notification } from '../database/models';
 
 export const validateUserRight = async (businessId, userId) => {
   try {
@@ -35,8 +35,11 @@ export const validateUserRight = async (businessId, userId) => {
 };
 export const validateNotificationOwner = async (notificationId, userId) => {
   try {
-    const notification = await Notification
-      .findById(notificationId);
+    const notification = await Notification.findOne({
+      where: {
+        id: notificationId
+      },
+    });
     if (Number(notification.userId) !== Number(userId)) {
       return {
         status: 401,

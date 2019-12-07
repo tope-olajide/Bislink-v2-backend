@@ -4,6 +4,7 @@ import Businesses from '../../controllers/business';
 import Favourite from '../../controllers/favourite';
 import Follower from '../../controllers/follow';
 import Auth from '../../middleware/auth';
+import Notifications from '../../controllers/notification';
 
 const user = express.Router();
 user.post('/signup', User.signup);
@@ -27,7 +28,12 @@ user
   .post(Follower.followUser)
   .delete(Follower.unFollowUser);
 
-
+  user.get('/notifications/all', Notifications.getAllNotifications);
+  user.get('/notifications/seen', Notifications.getReadNotifications);
+  user.get('/notifications/:notificationId', Notifications.viewNotification);
+  user.delete('/notifications/:notificationId', Notifications.deleteNotification);
+  user.get('/notifications', Notifications.getUnreadNotifications);
+  user.put('/notifications', Notifications.markAllUnreadNotificationsAsRead);
 
 
 export default user;

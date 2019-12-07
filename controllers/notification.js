@@ -4,7 +4,7 @@ import {
 } from '../database/models';
 import {
   validateNotificationOwner
-} from '../middleware/userValidation';
+} from '../middleware/userValidator';
 
 export default class Notifications {
   static async getAllNotifications({
@@ -14,7 +14,7 @@ export default class Notifications {
     try {
       const allNotifications = await Notification
         .findAll({
-          attributes: ['id', 'title', 'message', 'createdAt'],
+          attributes: ['id', 'title','notificationState', 'message', 'createdAt'],
           where: {
             userId
           },
@@ -66,7 +66,7 @@ export default class Notifications {
       const verifyNotificationOwner = await validateNotificationOwner(notificationId, userId);
       if (verifyNotificationOwner.success) {
         const notificationFound = verifyNotificationOwner.notification;
-        const notification = await notificationFound.updateAttributes({
+        const notification = await notificationFound.update({
           notificationState: 'seen'
         });
         const readNotificationsCount = await Notification.count({
@@ -135,9 +135,9 @@ export default class Notifications {
   static async getUnreadNotifications({ user }, res) {
     const userId = user.id;
     try {
-      const unreadNotifications = Notification
+      const unreadNotifications = await Notification
         .findAll({
-          attributes: ['id', 'title', 'message', 'createdAt'],
+          attributes: ['id', 'title', 'message','notificationState', 'createdAt'],
           where: {
             userId,
             notificationState: 'unseen'
@@ -184,12 +184,12 @@ export default class Notifications {
   static async getReadNotifications({ user }, res) {
     const userId = user.id;
     try {
-      const readNotifications = Notification
+      const readNotifications = await Notification
         .findAll({
           attributes: ['id', 'title', 'message', 'createdAt'],
           where: {
             userId,
-            notificationState: 'unseen'
+            notificationState: 'seen'
           },
           order: [
             ['createdAt', 'DESC']
@@ -240,7 +240,7 @@ export default class Notifications {
             notificationState: 'unseen'
           }
         });
-      const markAsRead = unSeenNotifications.map((eachNotification) => eachNotification.updateAttributes({
+      const markAsRead = unSeenNotifications.map((eachNotification) => eachNotification.update({
         notificationState: 'seen'
       }));
       const notification = Promise.all(markAsRead);
