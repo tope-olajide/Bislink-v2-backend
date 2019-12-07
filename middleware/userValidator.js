@@ -1,6 +1,6 @@
 import { Business, } from '../database/models';
 
-const validateUserRight = async (businessId, userId) => {
+export const validateUserRight = async (businessId, userId) => {
   try {
     const businessFound = await Business.findOne({
       where: {
@@ -34,24 +34,25 @@ const validateUserRight = async (businessId, userId) => {
   }
 };
 export const validateNotificationOwner = async (notificationId, userId) => {
-  try {const notification = await Notification
-    .findById(notificationId);
-  if (Number(notification.userId) !== Number(userId)) {
+  try {
+    const notification = await Notification
+      .findById(notificationId);
+    if (Number(notification.userId) !== Number(userId)) {
+      return {
+        status: 401,
+        success: false,
+        message: 'You cannot view or delete a notification that is not yours'
+      };
+    }
+    return {
+      success: true,
+      notification
+    };
+  } catch (error) {
     return {
       success: false,
-      message: 'You cannot view or delete a notification that is not yours'
+      status: 500,
+      message: 'Error verifying notification owner'
     };
   }
-  return {
-    success: true,
-    notification
-  };
-}
-catch (error) {
-  return {
-    success: false,
-    status: 500,
-    message: 'Error verifying notification owner'
-  }
-}
-export default validateUserRight;
+};
