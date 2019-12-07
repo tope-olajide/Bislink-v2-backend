@@ -33,4 +33,25 @@ const validateUserRight = async (businessId, userId) => {
     };
   }
 };
+export const validateNotificationOwner = async (notificationId, userId) => {
+  try {const notification = await Notification
+    .findById(notificationId);
+  if (Number(notification.userId) !== Number(userId)) {
+    return {
+      success: false,
+      message: 'You cannot view or delete a notification that is not yours'
+    };
+  }
+  return {
+    success: true,
+    notification
+  };
+}
+catch (error) {
+  return {
+    success: false,
+    status: 500,
+    message: 'Error verifying notification owner'
+  }
+}
 export default validateUserRight;
