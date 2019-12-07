@@ -1,11 +1,13 @@
 /* eslint-disable require-jsdoc */
+import Sequelize from 'sequelize';
 import {
   Upvote,
   Downvote,
   Business,
   User, Notification
-} from '../models';
+} from '../database/models';
 
+const Op = [Sequelize];
 export default class Vote {
   static async upvoteBusiness({ user, params }, res) {
     const userId = user.id;
@@ -16,13 +18,8 @@ export default class Vote {
       const response = await Downvote
         .destroy({
           where: {
-            $and: [{
-              userId
-            },
-            {
-              businessId
-            }
-            ]
+            userId,
+            businessId
           }
         });
       if (response === 1) {
@@ -32,10 +29,11 @@ export default class Vote {
               id: businessId
             }
           });
-        businessModel.decrement('downvotes');
+        await businessModel.decrement('downvotes');
       }
+
       // eslint-disable-next-line no-unused-vars
-      const [createdVote, created] = Upvote
+      const [createdVote, created] = await Upvote
         .findOrCreate({
           where: {
             userId,
@@ -95,13 +93,8 @@ export default class Vote {
       const response = await Upvote
         .destroy({
           where: {
-            $and: [{
-              userId
-            },
-            {
-              businessId
-            }
-            ]
+            userId,
+            businessId
           }
         });
       if (response === 1) {
@@ -111,10 +104,10 @@ export default class Vote {
               id: businessId
             }
           });
-        businessModel.decrement('upvotes');
+        await businessModel.decrement('upvotes');
       }
       // eslint-disable-next-line no-unused-vars
-      const [createdVote, created] = Downvote
+      const [createdVote, created] = await Downvote
         .findOrCreate({
           where: {
             userId,
