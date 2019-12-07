@@ -14,7 +14,7 @@ import {
   validateBusiness
 } from '../middleware/validator';
 import
-validateUserRight
+{ validateUserRight }
   from '../middleware/userValidator';
 
 const { Op } = Sequelize;
