@@ -19,4 +19,5 @@ business.route('/:businessId')
 business
   .route('/:businessId/reviews')
   .post(Reviews.postReview)
+  .get(Reviews.getBusinessReviews);
 export default business;
