@@ -5,6 +5,7 @@ import Favourite from '../../controllers/favourite';
 import Follower from '../../controllers/follow';
 import Auth from '../../middleware/auth';
 import Notifications from '../../controllers/notification';
+import Images from '../../controllers/image'
 
 const user = express.Router();
 user.post('/signup', User.signup);
@@ -34,6 +35,6 @@ user
   user.delete('/notifications/:notificationId', Notifications.deleteNotification);
   user.get('/notifications', Notifications.getUnreadNotifications);
   user.put('/notifications', Notifications.markAllUnreadNotificationsAsRead);
-
+  user.post('/gallery', Images.uploadImage);
 
 export default user;
