@@ -20,6 +20,15 @@ module.exports = {
         as: 'userId'
       }
     },
+    businessId: {
+      type: Sequelize.INTEGER,
+      onDelete: 'CASCADE',
+      references: {
+        model: 'Businesses',
+        key: 'id',
+        as: 'businessId',
+      }
+    },
     imageUrl: {
       type: Sequelize.STRING
     },

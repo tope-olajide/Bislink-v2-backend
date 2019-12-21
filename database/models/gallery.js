@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
   const Gallery = sequelize.define('Gallery', {
     imageId: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
     },
     imageUrl: {
       type: DataTypes.STRING,
@@ -21,7 +21,16 @@ module.exports = (sequelize, DataTypes) => {
         key: 'id',
         as: 'userId',
       }
-    }
+    },
+    businessId: {
+      type: DataTypes.INTEGER,
+      onDelete: 'CASCADE',
+      references: {
+        model: 'Businesses',
+        key: 'id',
+        as: 'businessId',
+      }
+    },
   });
   Gallery.associate = (models) => {
     Gallery.belongsTo(models.User, {
