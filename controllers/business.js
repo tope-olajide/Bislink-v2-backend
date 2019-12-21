@@ -8,7 +8,8 @@ import {
   Follower,
   Followee,
   Favourite,
-  Notification
+  Notification,
+  Gallery
 } from '../database/models';
 import {
   validateBusiness
@@ -18,6 +19,29 @@ import
   from '../middleware/userValidator';
 
 const { Op } = Sequelize;
+const uploadBusinessImage = async (userId, businessId, stringifiedImageUrl) => {
+  const parsedImageArray = JSON.parse(stringifiedImageUrl);
+  const createImageGallery = parsedImageArray.map((userImage) => ({
+    userId,
+    businessId,
+    imageId: userImage.imageId,
+    imageUrl: userImage.imageUrl
+  }));
+  try {
+    const createdGallery = await Gallery.bulkCreate(createImageGallery);
+    return ({
+      success: true,
+      message: 'Image uploaded successfully',
+      createdGallery
+    });
+  } catch (error) {
+    return ({
+      success: false,
+      message: 'An error occured',
+      error
+    });
+  }
+};
 const isBusinessNamePicked = async (userId, businessName) => {
   const business = await Business
     .findOne({
@@ -78,11 +102,31 @@ export default class Businesses {
         website,
         category,
         businessDescription,
-        userId,
-        businessImageUrl
+        userId
       });
       if (createdBusiness) {
-        res.status(201).json({
+        const businessId = createdBusiness.id;
+        if (businessImageUrl) {
+          const imageUpload = await uploadBusinessImage(userId, businessId, businessImageUrl);
+          if (imageUpload.success) {
+            const defaultBusinessImageUrl = imageUpload.createdGallery[0].imageUrl;
+            await createdBusiness.update({
+              defaultBusinessImageUrl
+            });
+            res.status(201).json({
+              success: true,
+              message: 'New Business created',
+              createdBusiness,
+              userId,
+              createdGallery: imageUpload.createdGallery
+            });
+          }
+          return res.status(500).json({
+            success: false,
+            message: 'Unable to save image url',
+          });
+        }
+        return res.status(201).json({
           success: true,
           message: 'New Business created',
           createdBusiness,
@@ -110,22 +154,22 @@ export default class Businesses {
       businessName,
       tagline,
       businessAddress,
-      phoneNumber1,
+      phoneNumber,
       website,
       category,
       businessDescription,
-      businessImageUrl,
+      stringifiedImageUrl,
       foundBusiness
     }) => {
       const modifiedBusiness = await foundBusiness.update({
         businessName,
         tagline,
         businessAddress,
-        phoneNumber1,
+        phoneNumber,
         website,
         category,
         businessDescription,
-        businessImageUrl
+        stringifiedImageUrl
       });
       const favouriteUserIds = await Favourite
         .findAll({
@@ -135,6 +179,22 @@ export default class Businesses {
           attributes: ['userId']
         });
       if (!favouriteUserIds.length) {
+        if (stringifiedImageUrl) {
+          const imageUpload = await uploadBusinessImage(userId, businessId, stringifiedImageUrl);
+          if (imageUpload.success) {
+            res.status(200).json({
+              success: true,
+              message: 'Business record updated successfully',
+              modifiedBusiness,
+              userId: user.id,
+              imageUpload
+            });
+          }
+          return res.status(500).json({
+            success: false,
+            message: 'Unable to save image url',
+          });
+        }
         res.status(200).json({
           success: true,
           message: 'Business record updated successfully',
@@ -151,6 +211,24 @@ export default class Businesses {
         message: `One of your favourite businesses named: ${modifiedBusiness.businessName} has been modified by its owner`
       }));
       const createdNotifications = await Notification.bulkCreate(notifyUsers);
+      if (stringifiedImageUrl) {
+        const imageUpload = await uploadBusinessImage(userId, businessId, stringifiedImageUrl);
+        if (imageUpload.success) {
+          res.status(200).json({
+            success: true,
+            message: 'Business record updated successfully',
+            modifiedBusiness,
+            notifyUsers,
+            createdNotifications,
+            userId: user.id,
+            imageUpload
+          });
+        }
+        return res.status(500).json({
+          success: false,
+          message: 'Unable to save image url',
+        });
+      }
       res.status(200).json({
         success: true,
         message: 'Business record updated successfully',
@@ -171,7 +249,7 @@ export default class Businesses {
       website,
       category,
       businessDescription,
-      businessImageUrl
+      stringifiedImageUrl
     } = body;
     const isUser = await validateUserRight(businessId, userId);
     if (isUser.success) {
@@ -199,7 +277,7 @@ export default class Businesses {
           website,
           category,
           businessDescription,
-          businessImageUrl,
+          stringifiedImageUrl,
           foundBusiness
         });
       }
@@ -220,7 +298,7 @@ export default class Businesses {
           website,
           category,
           businessDescription,
-          businessImageUrl,
+          stringifiedImageUrl,
           foundBusiness
         });
       }
@@ -301,7 +379,7 @@ export default class Businesses {
           include: [{
             model: User,
             attributes: ['fullname']
-          }],
+          }, ],
           limit,
           offset
         });
