@@ -1,6 +1,7 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable require-jsdoc */
 import Sequelize from 'sequelize';
+
 import BusinessSearch from './searchBusiness';
 import {
   Business,
@@ -17,6 +18,7 @@ import {
 import
 { validateUserRight }
   from '../middleware/userValidator';
+
 
 const { Op } = Sequelize;
 const uploadBusinessImage = async (userId, businessId, stringifiedImageUrl) => {
@@ -158,7 +160,7 @@ export default class Businesses {
       website,
       category,
       businessDescription,
-      stringifiedImageUrl,
+      businessImageUrl,
       foundBusiness
     }) => {
       const modifiedBusiness = await foundBusiness.update({
@@ -169,7 +171,7 @@ export default class Businesses {
         website,
         category,
         businessDescription,
-        stringifiedImageUrl
+        businessImageUrl
       });
       const favouriteUserIds = await Favourite
         .findAll({
@@ -179,9 +181,15 @@ export default class Businesses {
           attributes: ['userId']
         });
       if (!favouriteUserIds.length) {
-        if (stringifiedImageUrl) {
-          const imageUpload = await uploadBusinessImage(userId, businessId, stringifiedImageUrl);
+        if (businessImageUrl) {
+          const imageUpload = await uploadBusinessImage(userId, businessId, businessImageUrl);
           if (imageUpload.success) {
+            const defaultBusinessImageUrl = imageUpload.createdGallery[0].imageUrl;
+            if (!modifiedBusiness.defaultBusinessImageUrl) {
+              await modifiedBusiness.update({
+                defaultBusinessImageUrl
+              });
+            }
             res.status(200).json({
               success: true,
               message: 'Business record updated successfully',
@@ -211,9 +219,15 @@ export default class Businesses {
         message: `One of your favourite businesses named: ${modifiedBusiness.businessName} has been modified by its owner`
       }));
       const createdNotifications = await Notification.bulkCreate(notifyUsers);
-      if (stringifiedImageUrl) {
-        const imageUpload = await uploadBusinessImage(userId, businessId, stringifiedImageUrl);
+      if (businessImageUrl) {
+        const imageUpload = await uploadBusinessImage(userId, businessId, businessImageUrl);
         if (imageUpload.success) {
+          const defaultBusinessImageUrl = imageUpload.createdGallery[0].imageUrl;
+          if (!modifiedBusiness.defaultBusinessImageUrl) {
+            await modifiedBusiness.update({
+              defaultBusinessImageUrl
+            });
+          }
           res.status(200).json({
             success: true,
             message: 'Business record updated successfully',
@@ -249,7 +263,7 @@ export default class Businesses {
       website,
       category,
       businessDescription,
-      stringifiedImageUrl
+      businessImageUrl
     } = body;
     const isUser = await validateUserRight(businessId, userId);
     if (isUser.success) {
@@ -277,7 +291,7 @@ export default class Businesses {
           website,
           category,
           businessDescription,
-          stringifiedImageUrl,
+          businessImageUrl,
           foundBusiness
         });
       }
@@ -298,7 +312,7 @@ export default class Businesses {
           website,
           category,
           businessDescription,
-          stringifiedImageUrl,
+          businessImageUrl,
           foundBusiness
         });
       }
@@ -482,6 +496,18 @@ export default class Businesses {
       } else {
         otherInfo.isFollowing = false;
       }
+      const imageGallery = await Gallery
+        .findAll({
+          where: {
+            businessId
+          }
+        });
+      if (imageGallery) {
+        otherInfo.businessPictures = imageGallery;
+      } else {
+        otherInfo.businessPictures = [];
+      }
+
       res.status(200).json({
         success: true,
         message: 'business found',
