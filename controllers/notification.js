@@ -14,7 +14,7 @@ export default class Notifications {
     try {
       const allNotifications = await Notification
         .findAll({
-          attributes: ['id', 'title','notificationState', 'message', 'createdAt'],
+          attributes: ['id', 'title', 'notificationState', 'message', 'createdAt'],
           where: {
             userId
           },
@@ -137,7 +137,7 @@ export default class Notifications {
     try {
       const unreadNotifications = await Notification
         .findAll({
-          attributes: ['id', 'title', 'message','notificationState', 'createdAt'],
+          attributes: ['id', 'title', 'message', 'notificationState', 'createdAt'],
           where: {
             userId,
             notificationState: 'unseen'
@@ -157,7 +157,7 @@ export default class Notifications {
           userId,
         }
       });
-      if (unreadNotifications.length) {
+     
         res.status(200).json({
           success: true,
           message: 'New notification(s) found',
@@ -165,14 +165,7 @@ export default class Notifications {
           allNotificationsCount,
           readNotificationsCount
         });
-      }
-      return res.status(204).json({
-        success: false,
-        message: 'You currently do not have any unread notification(s)',
-        unreadNotifications: [],
-        allNotificationsCount,
-        readNotificationsCount
-      });
+      
     } catch (error) {
       res.status(500).json({
         success: false,
@@ -253,6 +246,30 @@ export default class Notifications {
       res.status(500).json({
         success: false,
         message: 'Error fetching read notifications'
+      });
+    }
+  }
+
+  static async getUnreadNotificationCount({
+    user
+  }, res) {
+    const userId = user.id;
+    try {
+      const newNotificationsCount = await Notification.count({
+        where: {
+          userId,
+          notificationState: 'unseen'
+        }
+      });
+      return res.status(200).json({
+        success: true,
+        message: 'Notification(s) found',
+        newNotificationsCount
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching notifications'
       });
     }
   }
