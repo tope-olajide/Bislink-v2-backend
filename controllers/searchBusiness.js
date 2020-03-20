@@ -48,7 +48,7 @@ export default class BusinessSearch {
       businessName: { [Op.iLike]: `%${item}%` }
     }));
     const businessLocationQuery = bizLocation.map((item) => ({
-      businessAddress1: { [Op.iLike]: `%${item}%` }
+      businessAddress: { [Op.iLike]: `%${item}%` }
     }));
 
     const businesses = await Business
@@ -82,7 +82,7 @@ export default class BusinessSearch {
     const offset = (currentPage - 1) * limit;
     const bizLocation = query.location.split(' ');
     const businessLocationQuery = bizLocation.map((item) => ({
-      businessAddress1: { [Op.iLike]: `%${item}%` }
+      businessAddress: { [Op.iLike]: `%${item}%` }
     }));
     const businesses = await Business
       .findAndCountAll({
