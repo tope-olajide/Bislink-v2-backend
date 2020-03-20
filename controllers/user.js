@@ -3,7 +3,9 @@
 import jwt from 'jsonwebtoken';
 import Sequelize from 'sequelize';
 import bcryptjs from 'bcryptjs';
-import { User, Notification } from '../database/models';
+import { User, Notification,  Business,
+  Favourite,
+  Follower  } from '../database/models';
 import {
   validateUser, validateModifiedUser
 } from '../middleware/validator';
@@ -278,7 +280,86 @@ export default class Users {
       message: 'Password Changed Successfully',
       newPwd
     });
+  }
 
-
+  static async getUser({
+    user
+  }, res) {
+    const userId = user.id;
+    const userFound = await User.findOne({
+      attributes: ['id', 'fullname', 'about', 'location', 'phoneNumber', 'username', 'email', 'imageUrl'],
+      where: {
+        id: userId
+      }
+    });
+    if (!userFound) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found!'
+      });
+    }
+    const {
+      id,
+      fullname,
+      about,
+      location,
+      username,
+      email,
+      imageUrl,
+      phoneNumber
+    } = userFound;
+    const userInfo = {
+      userId: id,
+      fullname,
+      about,
+      location,
+      username,
+      email,
+      imageUrl,
+      phoneNumber
+    };
+    try {
+      const businesses = await Business.findAndCountAll({
+        where: {
+          userId
+        } 
+});
+      userInfo.myBusinesses = businesses.rows;
+      userInfo.myBusinessCount = businesses.count;
+      const favourites = await Favourite.findAll({
+        where: {
+          userId
+        },
+      });
+      const favouriteBusinessIds = favourites.map((favourite) => favourite.businessId);
+      const favouriteBusinesses = await Business.findAll({
+        where: { id: favouriteBusinessIds },
+      });
+      userInfo.myFavourites = favouriteBusinesses;
+      const followers = await Follower.findAndCountAll({
+        where: {
+          followerId: userId
+        },
+      });
+      userInfo.myFollowers = followers.rows;
+      userInfo.myFollowersCount = followers.count;
+      const followees = await Follower.findAndCountAll({
+        where: {
+          userId
+        }
+      });
+      userInfo.myFollowees = followees.rows;
+      userInfo.myFolloweesCount = followees.count;
+      return res.status(200).json({
+        success: true,
+        message: 'User found!',
+        user: userInfo
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Error fetching user's profile"
+      });
+    }
   }
 }
