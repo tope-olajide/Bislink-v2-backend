@@ -63,7 +63,7 @@ export default class Reviews {
           },
           include: [{
             model: User,
-            attributes: ['username', 'ImageUrl']
+            attributes: ['username', 'imageUrl']
           }],
           order: [
             ['id', 'DESC']
@@ -96,7 +96,7 @@ export default class Reviews {
           },
           include: [{
             model: User,
-            attributes: ['username', 'ImageUrl']
+            attributes: ['username', 'imageUrl']
           }],
           order: [
             ['id', 'DESC']
