@@ -1,5 +1,3 @@
-/* eslint-disable class-methods-use-this */
-/* eslint-disable require-jsdoc */
 import Sequelize from 'sequelize';
 
 import BusinessSearch from './searchBusiness';
@@ -21,6 +19,7 @@ import
 
 
 const { Op } = Sequelize;
+
 const uploadBusinessImage = async (userId, businessId, stringifiedImageUrl) => {
   const parsedImageArray = JSON.parse(stringifiedImageUrl);
   const createImageGallery = parsedImageArray.map((userImage) => ({
