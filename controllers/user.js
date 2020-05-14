@@ -82,7 +82,7 @@ export default class Users {
         .create({
           userId: createdUser.id,
           title: 'Welcome to Biz-link',
-          message: `Hello ${createdUser.fullname}, I am very delighted to welcome you as a new member of my Web App. I hope you will enjoy the app. Have fun. 😉`,
+          message: `Hello ${createdUser.fullname}, I am very happy to welcome you as the newest member of my Web App. I hope you will enjoy the app. Have fun. 😉`,
         });
       return res.status(201).json({
         createdUser,

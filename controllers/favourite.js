@@ -1,4 +1,4 @@
-/* eslint-disable require-jsdoc */
+
 import Sequelize from 'sequelize';
 import {
   Favourite, Business, User, Notification
