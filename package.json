@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "babel-node index.js",
+    "start": "babel-node app.js",
     "migrate": "babel-node database/models/index ",
     "dev": "nodemon --exec babel-node index.js"
   },
