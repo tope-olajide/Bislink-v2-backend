@@ -4,7 +4,7 @@ import Businesses from '../../controllers/business';
 import Reviews from '../../controllers/review';
 import Vote from '../../controllers/vote';
 import Auth from '../../middleware/auth';
-import Gallery from '../../controllers/gallery'
+import Gallery from '../../controllers/gallery';
 
 
 const business = express.Router();
